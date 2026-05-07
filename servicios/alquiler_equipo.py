@@ -1,64 +1,46 @@
 from modelos.servicio import Servicio
-from excepciones.excepciones_personalizadas import ServicioNoDisponibleError, ParametroInvalidoError
+from excepciones.excepciones_personalizadas import ServicioInvalidoError, CalculoInconsistenteError
+from utils.logger import log_info, log_error
 
-# Clase concreta que representa el servicio de alquiler de equipos
-# tecnologicos de Software FJ. Hereda de la clase abstracta Servicio.
 
 class AlquilerEquipo(Servicio):
+    """Servicio especializado para alquiler de equipos tecnológicos."""
 
-    # Constructor de la clase AlquilerEquipo
-    # id_servicio: Identificador único del servicio
-    # tipo_equipo: Tipo de equipo a alquilar (computador, proyector, etc.)
-    # precio_dia: Costo por día de alquiler
-
-    def __init__(self, id_servicio, tipo_equipo, precio_dia):
-        super().__init__(id_servicio, "Alquiler de Equipo")
+    def __init__(self, nombre: str, tipo_equipo: str, precio_dia: float):
+        super().__init__(nombre, precio_dia)
         self.__tipo_equipo = tipo_equipo
         self.__precio_dia = precio_dia
 
-    # Retorna el tipo de equipo
     @property
-    def tipo_equipo(self):
+    def tipo_equipo(self) -> str:
         return self.__tipo_equipo
 
-    # Retorna el precio por día
-    @property
-    def precio_dia(self):
-        return self.__precio_dia
-
-    # Valida que los parametros del servicio sean correctos
-    # Lanza ParametroInvalidoError si el tipo de equipo está vacio
-    # Lanza ServicioNoDisponibleError si el servicio no está disponible
-
-    def validar_parametros(self):
-        if not self.__tipo_equipo or self.__tipo_equipo.strip() == "":
-            raise ParametroInvalidoError("El tipo de equipo no puede estar vacio")
-        if self.__precio_dia <= 0:
-            raise ParametroInvalidoError("El precio por día debe ser mayor a 0")
-        if not self.disponible:
-            raise ServicioNoDisponibleError("El servicio de alquiler no está disponible")
-
-    # Calcula el costo del alquiler segun los dias, impuesto y descuento
-    # dias: cantidad de dias de alquiler
-    # descuento: porcentaje de descuento (0 a 1). Por defecto 0
-    # con_impuesto: si True aplica IVA del 19%. Por defecto False
-
-    def calcular_costo(self, dias, descuento=0, con_impuesto=False):
+    def calcular_costo(self, duracion: float, impuesto: float = 0, descuento: float = 0) -> float:
         try:
-            self.validar_parametros()
-            impuesto = 0.19 if con_impuesto else 0
-            costo = self.__precio_dia * dias * (1 + impuesto) * (1 - descuento)
-            return round(costo, 2)
-        except Exception as e:
-            raise e
+            self._validar_calculo(impuesto, descuento)
+            if duracion <= 0:
+                raise ServicioInvalidoError("La duración debe ser mayor a cero.")
+            costo = self.__precio_dia * duracion * (1 + impuesto) * (1 - descuento)
+            log_info(f"Costo AlquilerEquipo '{self.nombre}': ${costo:,.0f} ({duracion}d, IVA:{impuesto}, Desc:{descuento})")
+            return costo
+        except (CalculoInconsistenteError, ServicioInvalidoError) as e:
+            log_error(str(e))
+            raise
 
-    # Retorna una descripcion detallada del servicio de alquiler
-    def describir_servicio(self):
-        return (f"Servicio: Alquiler de Equipo\n"
-                f"Tipo de equipo: {self.__tipo_equipo}\n"
-                f"Precio por día: ${self.__precio_dia}\n"
-                f"Disponible: {'Si' if self.disponible else 'No'}")
+    def describir_servicio(self) -> str:
+        return (f"Alquiler de Equipo '{self.nombre}' | "
+                f"Tipo: {self.__tipo_equipo} | "
+                f"Precio: ${self.__precio_dia:,.0f}/día")
 
-    # Retorna una representación en texto del servicio
-    def __str__(self):
-        return f"AlquilerEquipo [{self.id_servicio}]: {self.__tipo_equipo} - ${self.__precio_dia}/día"
+    def validar_parametros(self) -> bool:
+        try:
+            if not self.__tipo_equipo or not self.__tipo_equipo.strip():
+                raise ServicioInvalidoError(f"El tipo de equipo para '{self.nombre}' no puede estar vacío.")
+            if self.__precio_dia <= 0:
+                raise ServicioInvalidoError(f"El precio por día de '{self.nombre}' debe ser mayor a cero.")
+        except ServicioInvalidoError as e:
+            log_error(str(e))
+            raise
+        else:
+            log_info(f"Servicio '{self.nombre}' validado correctamente.")
+            return True
