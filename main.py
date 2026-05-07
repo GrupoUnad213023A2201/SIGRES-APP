@@ -211,7 +211,7 @@ def crear_reserva():
         servicio_id = int(input("ID del servicio: "))
         fecha = input("Fecha (YYYY-MM-DD): ").strip()
         hora = input("Hora (HH:MM): ").strip()
-        duracion = float(input("Duración (horas o días): "))
+        duracion = float(input("Duración (en horas): "))
 
         cliente = next((c for c in clientes if c.id == cliente_id), None)
         if not cliente:
