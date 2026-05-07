@@ -1,0 +1,9 @@
+# SIGRES - Software FJ
+# Sistema Integral de Gestión de Clientes, Servicios y Reservas
+Python 3.13.12 
+
+# Módulos nativos utilizados (no requieren instalación):
+# - abc        → Clases abstractas
+# - logging    → Sistema de logs
+# - datetime   → Manejo de fechas en reservas
+# - re         → Validación de correos con expresiones regulares
