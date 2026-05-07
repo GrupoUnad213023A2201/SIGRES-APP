@@ -2,7 +2,6 @@
 # SIGRES - Software FJ
 # Archivo: main.py
 # Descripción: Punto de entrada del sistema. Incluye menú principal
-#              y 10 simulaciones de operaciones válidas e inválidas.
 # =============================================================================
 
 from utils.logger import log_info, log_warning, log_error
