@@ -1,39 +1,39 @@
-# --- Custom Exceptions ---
-class ReservationError(Exception):
-    """Base class for reservation-related exceptions."""
+# --- Excepciones Personalizadas ---
+class ErrorReserva(Exception):
+    """Clase base para excepciones relacionadas con reservas."""
     pass
 
-class ReservationStatusError(ReservationError):
-    """Raised when a status transition is invalid."""
+class ErrorEstadoReserva(ErrorReserva):
+    """Se lanza cuando una transición de estado no es válida."""
     pass
 
 
-# --- Reservation Class ---
-class Reservation:
-    def __init__(self, reservation_id, customer, date, details):
-        self.reservation_id = reservation_id
-        self.customer = customer  # Expected to be a Customer object
-        self.date = date
-        self.details = details
-        self.status = "Pending"  # Possible statuses: Pending, Confirmed, Canceled
+# --- Clase Reserva ---
+class Reserva:
+    def __init__(self, id_reserva, cliente, fecha, detalles):
+        self.id_reserva = id_reserva
+        self.cliente = cliente  # Se espera que sea un objeto de la clase Cliente
+        self.fecha = fecha
+        self.detalles = detalles
+        self.estado = "Pendiente"  # Estados posibles: Pendiente, Confirmada, Cancelada
 
-    def confirm(self):
-        """Confirms the reservation if it's currently Pending."""
-        if self.status == "Confirmed":
-            raise ReservationStatusError(f"Reservation {self.reservation_id} is already confirmed.")
-        elif self.status == "Canceled":
-            raise ReservationStatusError(f"Cannot confirm reservation {self.reservation_id} because it was canceled.")
+    def confirmar(self):
+        """Confirma la reserva si su estado actual es Pendiente."""
+        if self.estado == "Confirmada":
+            raise ErrorEstadoReserva(f"La reserva {self.id_reserva} ya está confirmada.")
+        elif self.estado == "Cancelada":
+            raise ErrorEstadoReserva(f"No se puede confirmar la reserva {self.id_reserva} porque fue cancelada.")
         
-        self.status = "Confirmed"
-        print(f"Success: Reservation {self.reservation_id} confirmed for {self.customer.name}.")
+        self.estado = "Confirmada"
+        print(f"Éxito: Reserva {self.id_reserva} confirmada para {self.cliente.nombre}.")
 
-    def cancel(self):
-        """Cancels the reservation if it's not already canceled."""
-        if self.status == "Canceled":
-            raise ReservationStatusError(f"Reservation {self.reservation_id} is already canceled.")
+    def cancelar(self):
+        """Cancela la reserva si no ha sido cancelada previamente."""
+        if self.estado == "Cancelada":
+            raise ErrorEstadoReserva(f"La reserva {self.id_reserva} ya está cancelada.")
         
-        self.status = "Canceled"
-        print(f"Success: Reservation {self.reservation_id} has been canceled.")
+        self.estado = "Cancelada"
+        print(f"Éxito: La reserva {self.id_reserva} ha sido cancelada.")
 
     def __str__(self):
-        return f"Reservation #{self.reservation_id} | Status: {self.status} | Date: {self.date} | Customer: {self.customer.name}"
+        return f"Reserva #{self.id_reserva} | Estado: {self.estado} | Fecha: {self.fecha} | Cliente: {self.cliente.nombre}"
