@@ -13,7 +13,7 @@ from excepciones.excepciones_personalizadas import (
     CalculoInconsistenteError, OperacionNoPermitidaError
 )
 from modelos.cliente import Cliente
-from modelos.reserva import reserva
+from modelos.reserva import Reserva
 from servicios.reserva_sala import ReservaSala
 from servicios.alquiler_equipo import AlquilerEquipo
 from servicios.asesoria_especializada import AsesoriaEspecializada
